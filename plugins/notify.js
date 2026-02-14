@@ -1,6 +1,11 @@
 export const Notify = async ({ client, $, directory }) => {
   const linuxIconPath = new URL("./opencode-notify-icon.svg", import.meta.url).pathname
 
+  const markKittyTabNeedsInput = () => {
+    if (!process.env.KITTY_WINDOW_ID) return
+    process.stdout.write("\x07")
+  }
+
   const pickSessionLabel = (session, sessionID) => {
     if (!session || typeof session !== "object") return sessionID
     const title = typeof session.title === "string" ? session.title.trim() : ""
@@ -78,6 +83,12 @@ export const Notify = async ({ client, $, directory }) => {
 
       try {
         await sendOsNotification(sessionLabel)
+      } catch (error) {
+        void error
+      }
+
+      try {
+        markKittyTabNeedsInput()
       } catch (error) {
         void error
       }
