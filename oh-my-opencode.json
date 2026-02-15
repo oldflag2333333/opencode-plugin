@@ -5,7 +5,7 @@
   ],
   "agents": {
     "sisyphus": {
-      "model": "kimi-for-coding/k2p5"
+      "model": "openai/gpt-5.3-codex"
     },
     "hephaestus": {
       "model": "openai/gpt-5.3-codex"
@@ -32,7 +32,7 @@
       "model": "openai/gpt-5.2"
     },
     "atlas": {
-      "model": "kimi-for-coding/k2p5"
+      "model": "openai/gpt-5.2-codex"
     }
   },
   "categories": {
@@ -58,7 +58,7 @@
       "model": "github-copilot/claude-opus-4.6"
     },
     "writing": {
-      "model": "kimi-for-coding/k2p5"
+      "model": "zhipuai-coding-plan/glm-4.7"
     }
   }
 
