@@ -1,5 +1,28 @@
+import fs from "node:fs"
+import path from "node:path"
+import os from "node:os"
+
 export const Notify = async ({ client, $, directory }) => {
   const linuxIconPath = new URL("./opencode-notify-icon.svg", import.meta.url).pathname
+
+  const DEFAULT_CONFIG = {
+    suppressWhenFocused: true,
+    notifyOnError: true,
+    notifyOnPermission: true,
+    notifyOnQuestion: true,
+    notifyChildSessions: false,
+  }
+
+  const configPath = path.join(os.homedir(), ".config", "opencode", "plugins", "notify-config.json")
+  let config = DEFAULT_CONFIG
+
+  try {
+    const configContent = fs.readFileSync(configPath, "utf-8")
+    const userConfig = JSON.parse(configContent)
+    config = { ...DEFAULT_CONFIG, ...userConfig }
+  } catch {
+    // Use defaults if file doesn't exist or is invalid
+  }
 
   // Known terminal emulator identifiers used for focus detection.
   // Lowercase entries cover Linux Wayland class names and app IDs.
@@ -152,7 +175,7 @@ export const Notify = async ({ client, $, directory }) => {
 
   /**
    * Orchestrates notification delivery:
-   *   1. Check terminal focus (if skipDesktopIfFocused is true)
+   *   1. Check terminal focus (if config.suppressWhenFocused is true)
    *   2. Show TUI toast (always)
    *   3. Send desktop notification (unless suppressed by focus)
    *   4. Fire Kitty bell (always)
@@ -161,10 +184,10 @@ export const Notify = async ({ client, $, directory }) => {
    * @param {string} opts.title - Notification title
    * @param {string} opts.message - Notification body
    * @param {"info"|"success"|"warning"|"error"} opts.variant - TUI toast variant
-   * @param {boolean} opts.skipDesktopIfFocused - If true, suppress desktop notification when terminal is focused
+   * @param {object} opts.config - Configuration object
    */
-  const sendNotification = async ({ title, message, variant, skipDesktopIfFocused }) => {
-    const focused = skipDesktopIfFocused ? await isTerminalFocused() : false
+  const sendNotification = async ({ title, message, variant, config }) => {
+    const focused = config.suppressWhenFocused ? await isTerminalFocused() : false
 
     try {
       await client.tui.showToast({ directory, title, message, variant })
@@ -187,11 +210,13 @@ export const Notify = async ({ client, $, directory }) => {
     }
   }
 
-  const handlePermissionEvent = async (event) => {
+  const handlePermissionEvent = async (event, config) => {
+    if (!config.notifyOnPermission) return
+
     const { sessionID } = event.properties
     const session = await getSessionByID(sessionID)
     if (!session) return
-    if (session.parentID) return
+    if (!config.notifyChildSessions && session.parentID) return
 
     const sessionLabel = pickSessionLabel(session, sessionID)
 
@@ -206,7 +231,7 @@ export const Notify = async ({ client, $, directory }) => {
       title: "Permission needed",
       message: sessionLabel + ": " + permissionDescription,
       variant: "warning",
-      skipDesktopIfFocused: true,
+      config,
     })
   }
 
@@ -216,7 +241,7 @@ export const Notify = async ({ client, $, directory }) => {
         const { sessionID } = event.properties
         const session = await getSessionByID(sessionID)
         if (!session) return
-        if (session.parentID) return
+        if (!config.notifyChildSessions && session.parentID) return
 
         const sessionLabel = pickSessionLabel(session, sessionID)
 
@@ -224,9 +249,11 @@ export const Notify = async ({ client, $, directory }) => {
           title: "Agent is ready for input",
           message: sessionLabel,
           variant: "info",
-          skipDesktopIfFocused: true,
+          config,
         })
       } else if (event.type === "session.error") {
+        if (!config.notifyOnError) return
+
         const { sessionID, error } = event.properties
 
         // Skip notification for user-initiated aborts
@@ -236,7 +263,7 @@ export const Notify = async ({ client, $, directory }) => {
         if (sessionID) {
           const session = await getSessionByID(sessionID)
           // Filter out child sessions (only notify for parent sessions)
-          if (session?.parentID) return
+          if (!config.notifyChildSessions && session?.parentID) return
           sessionLabel = pickSessionLabel(session, sessionID)
         }
 
@@ -260,13 +287,15 @@ export const Notify = async ({ client, $, directory }) => {
           title: "Error occurred",
           message: truncatedMessage,
           variant: "error",
-          skipDesktopIfFocused: false,
+          config,
         })
       } else if (event.type === "question.asked") {
+        if (!config.notifyOnQuestion) return
+
         const { sessionID } = event.properties
         const session = await getSessionByID(sessionID)
         if (!session) return
-        if (session.parentID) return
+        if (!config.notifyChildSessions && session.parentID) return
 
         const sessionLabel = pickSessionLabel(session, sessionID)
 
@@ -274,12 +303,12 @@ export const Notify = async ({ client, $, directory }) => {
           title: "Question for you",
           message: sessionLabel,
           variant: "warning",
-          skipDesktopIfFocused: true,
+          config,
         })
       } else if (event.type === "permission.updated") {
-        await handlePermissionEvent(event)
+        await handlePermissionEvent(event, config)
       } else if (event.type === "permission.asked") {
-        await handlePermissionEvent(event)
+        await handlePermissionEvent(event, config)
       }
     },
   }
