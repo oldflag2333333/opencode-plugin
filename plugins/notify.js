@@ -2,7 +2,7 @@ import fs from "node:fs"
 import path from "node:path"
 import os from "node:os"
 
-export const Notify = async ({ client, $, directory }) => {
+export const Notify = async ({ client, directory }) => {
   const linuxIconPath = new URL("./opencode-notify-icon.svg", import.meta.url).pathname
 
   const DEFAULT_CONFIG = {
@@ -68,6 +68,58 @@ export const Notify = async ({ client, $, directory }) => {
 
     const parts = normalized.split(/[^a-z0-9]+/).filter(Boolean)
     return parts.some((part) => KNOWN_TERMINAL_TOKENS.has(part))
+  }
+
+  const pickFocusedKittyWindowID = (payload) => {
+    if (!Array.isArray(payload)) return undefined
+
+    for (const osWindow of payload) {
+      const tabs = Array.isArray(osWindow?.tabs) ? osWindow.tabs : []
+      for (const tab of tabs) {
+        const windows = Array.isArray(tab?.windows) ? tab.windows : []
+        for (const window of windows) {
+          const id = window?.id
+          if (id === undefined || id === null) continue
+          const focused = window?.is_focused === true || window?.focused === true || window?.is_active === true
+          if (focused) return String(id)
+        }
+      }
+    }
+
+    for (const osWindow of payload) {
+      const tabs = Array.isArray(osWindow?.tabs) ? osWindow.tabs : []
+      for (const tab of tabs) {
+        const windows = Array.isArray(tab?.windows) ? tab.windows : []
+        for (const window of windows) {
+          const id = window?.id
+          if (id !== undefined && id !== null) return String(id)
+        }
+      }
+    }
+
+    return undefined
+  }
+
+  const isCurrentKittyWindowFocused = async () => {
+    const currentWindowID = process.env.KITTY_WINDOW_ID
+    if (!currentWindowID) return undefined
+
+    try {
+      const proc = Bun.spawn(["kitty", "@", "ls", "--match", "state:focused", "--output-format", "json"], {
+        stdout: "pipe",
+        stderr: "ignore",
+      })
+      const text = await new Response(proc.stdout).text()
+      if (!text.trim()) return undefined
+
+      const payload = JSON.parse(text)
+      const focusedWindowID = pickFocusedKittyWindowID(payload)
+      if (!focusedWindowID) return undefined
+
+      return focusedWindowID === String(currentWindowID)
+    } catch {
+      return undefined
+    }
   }
 
   const markKittyTabNeedsInput = () => {
@@ -226,9 +278,27 @@ export const Notify = async ({ client, $, directory }) => {
    * @param {object} opts.config - Configuration object
    */
   const sendNotification = async ({ title, message, variant, config }) => {
-    const focused = config.suppressWhenFocused ? await isTerminalFocused() : false
-    const suppressWhileFocused = focused && variant !== "error"
+    let suppressWhileFocused = false
     const shouldShowToast = variant === "error"
+
+    if (config.suppressWhenFocused && variant !== "error") {
+      const terminalFocused = await isTerminalFocused()
+
+      if (!terminalFocused) {
+        suppressWhileFocused = false
+      } else if (process.platform === "linux" && process.env.KITTY_WINDOW_ID) {
+        const sameKittyWindowFocused = await isCurrentKittyWindowFocused()
+        if (sameKittyWindowFocused === true) {
+          suppressWhileFocused = true
+        } else if (sameKittyWindowFocused === false) {
+          suppressWhileFocused = false
+        } else {
+          suppressWhileFocused = terminalFocused
+        }
+      } else {
+        suppressWhileFocused = terminalFocused
+      }
+    }
 
     if (suppressWhileFocused) return
 
@@ -240,7 +310,7 @@ export const Notify = async ({ client, $, directory }) => {
       }
     }
 
-    if (!focused || variant === "error") {
+    if (!suppressWhileFocused || variant === "error") {
       try {
         await sendOsNotification(title, message)
       } catch (error) {
