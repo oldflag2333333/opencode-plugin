@@ -187,6 +187,29 @@ export const Notify = async ({ client, $, directory }) => {
     }
   }
 
+  const handlePermissionEvent = async (event) => {
+    const { sessionID } = event.properties
+    const session = await getSessionByID(sessionID)
+    if (!session) return
+    if (session.parentID) return
+
+    const sessionLabel = pickSessionLabel(session, sessionID)
+
+    // v1: permission.updated uses .title field
+    // v2: permission.asked uses .permission field
+    const permissionDescription =
+      typeof event.properties.title === "string" ? event.properties.title
+      : typeof event.properties.permission === "string" ? event.properties.permission
+      : "Permission needed"
+
+    await sendNotification({
+      title: "Permission needed",
+      message: sessionLabel + ": " + permissionDescription,
+      variant: "warning",
+      skipDesktopIfFocused: true,
+    })
+  }
+
   return {
     event: async ({ event }) => {
       if (event.type === "session.idle") {
@@ -203,6 +226,60 @@ export const Notify = async ({ client, $, directory }) => {
           variant: "info",
           skipDesktopIfFocused: true,
         })
+      } else if (event.type === "session.error") {
+        const { sessionID, error } = event.properties
+
+        // Skip notification for user-initiated aborts
+        if (error?.type === "aborted") return
+
+        let sessionLabel = "Unknown session"
+        if (sessionID) {
+          const session = await getSessionByID(sessionID)
+          // Filter out child sessions (only notify for parent sessions)
+          if (session?.parentID) return
+          sessionLabel = pickSessionLabel(session, sessionID)
+        }
+
+        // Extract error message based on error type
+        let errorMessage = "Something went wrong"
+        if (error?.type === "provider_auth") {
+          errorMessage = "Auth error: " + (error.data?.message || "")
+        } else if (error?.type === "unknown") {
+          errorMessage = error.data?.message || "Unknown error"
+        } else if (error?.type === "output_length") {
+          errorMessage = "Output too long"
+        } else if (error?.type === "api") {
+          errorMessage = "API error: " + (error.data?.message || "")
+        }
+
+        // Truncate message to 100 characters
+        const fullMessage = sessionLabel + ": " + errorMessage
+        const truncatedMessage = fullMessage.length > 100 ? fullMessage.slice(0, 97) + "..." : fullMessage
+
+        await sendNotification({
+          title: "Error occurred",
+          message: truncatedMessage,
+          variant: "error",
+          skipDesktopIfFocused: false,
+        })
+      } else if (event.type === "question.asked") {
+        const { sessionID } = event.properties
+        const session = await getSessionByID(sessionID)
+        if (!session) return
+        if (session.parentID) return
+
+        const sessionLabel = pickSessionLabel(session, sessionID)
+
+        await sendNotification({
+          title: "Question for you",
+          message: sessionLabel,
+          variant: "warning",
+          skipDesktopIfFocused: true,
+        })
+      } else if (event.type === "permission.updated") {
+        await handlePermissionEvent(event)
+      } else if (event.type === "permission.asked") {
+        await handlePermissionEvent(event)
       }
     },
   }
