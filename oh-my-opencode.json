@@ -17,13 +17,13 @@
       "model": "zhipuai-coding-plan/glm-5"
     },
     "explore": {
-      "model": "zhipuai-coding-plan/glm-4.7"
+      "model": "github-copilot/grok-code-fast-1"
     },
     "multimodal-looker": {
       "model": "github-copilot/gemini-3-flash-preview"
     },
     "prometheus": {
-      "model": "kimi-for-coding/k2p5"
+      "model": "github-copilot/claude-opus-4.6"
     },
     "metis": {
       "model": "github-copilot/claude-opus-4.6"

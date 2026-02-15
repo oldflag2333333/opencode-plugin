@@ -1,4 +1,7 @@
 {
-  "plugin": ["oh-my-opencode", "@franlol/opencode-md-table-formatter"],
+  "plugin": [
+    "oh-my-opencode",
+    "@franlol/opencode-md-table-formatter"
+  ],
   "$schema": "https://opencode.ai/config.json"
 }
