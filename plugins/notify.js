@@ -24,10 +24,7 @@ export const Notify = async ({ client, $, directory }) => {
     // Use defaults if file doesn't exist or is invalid
   }
 
-  // Known terminal emulator identifiers used for focus detection.
-  // Lowercase entries cover Linux Wayland class names and app IDs.
-  // macOS process names are matched case-insensitively via .toLowerCase().
-  const KNOWN_TERMINALS = new Set([
+  const KNOWN_TERMINAL_EXACT = new Set([
     "ghostty",
     "kitty",
     "foot",
@@ -41,7 +38,37 @@ export const Notify = async ({ client, $, directory }) => {
     "st",
     "urxvt",
     "xterm",
+    "com.mitchellh.ghostty",
+    "org.wezfurlong.wezterm",
+    "org.alacritty.alacritty",
+    "dev.warp.warp",
+    "net.kovidgoyal.kitty",
   ])
+
+  const KNOWN_TERMINAL_TOKENS = new Set([
+    "ghostty",
+    "kitty",
+    "foot",
+    "alacritty",
+    "wezterm",
+    "iterm2",
+    "terminal",
+    "hyper",
+    "warp",
+    "rio",
+    "urxvt",
+    "xterm",
+  ])
+
+  const isKnownTerminalIdentifier = (value) => {
+    if (typeof value !== "string") return false
+    const normalized = value.trim().toLowerCase()
+    if (!normalized) return false
+    if (KNOWN_TERMINAL_EXACT.has(normalized)) return true
+
+    const parts = normalized.split(/[^a-z0-9]+/).filter(Boolean)
+    return parts.some((part) => KNOWN_TERMINAL_TOKENS.has(part))
+  }
 
   const markKittyTabNeedsInput = () => {
     if (!process.env.KITTY_WINDOW_ID) return
@@ -108,13 +135,15 @@ export const Notify = async ({ client, $, directory }) => {
     // Hyprland
     if (process.env.HYPRLAND_INSTANCE_SIGNATURE) {
       try {
-        const result = await $`hyprctl -j activewindow`.nothrow()
-        const json = JSON.parse(result.stdout.toString())
+        const proc = Bun.spawn(["hyprctl", "-j", "activewindow"], {
+          stdout: "pipe",
+          stderr: "ignore",
+        })
+        const text = await new Response(proc.stdout).text()
+        const json = JSON.parse(text)
         // Hyprland returns {} on an empty workspace — .class will be undefined
         const cls = json?.class
-        if (typeof cls === "string" && cls.length > 0) {
-          return KNOWN_TERMINALS.has(cls.toLowerCase())
-        }
+        if (typeof cls === "string" && cls.length > 0) return isKnownTerminalIdentifier(cls)
         return false
       } catch {
         return false
@@ -124,14 +153,16 @@ export const Notify = async ({ client, $, directory }) => {
     // Niri
     if (process.env.NIRI_SOCKET) {
       try {
-        const result = await $`niri msg --json focused-window`.nothrow()
-        const json = JSON.parse(result.stdout.toString())
+        const proc = Bun.spawn(["niri", "msg", "--json", "focused-window"], {
+          stdout: "pipe",
+          stderr: "ignore",
+        })
+        const text = await new Response(proc.stdout).text()
+        const json = JSON.parse(text)
         // Niri returns null when nothing is focused
         if (json === null || json === undefined) return false
         const appId = json?.app_id
-        if (typeof appId === "string" && appId.length > 0) {
-          return KNOWN_TERMINALS.has(appId.toLowerCase())
-        }
+        if (typeof appId === "string" && appId.length > 0) return isKnownTerminalIdentifier(appId)
         return false
       } catch {
         return false
@@ -141,12 +172,13 @@ export const Notify = async ({ client, $, directory }) => {
     // macOS
     if (process.platform === "darwin") {
       try {
-        const result =
-          await $`osascript -e 'tell application "System Events" to get name of first process whose frontmost is true'`.nothrow()
-        const name = result.stdout.toString().trim()
-        if (name.length > 0) {
-          return KNOWN_TERMINALS.has(name.toLowerCase())
-        }
+        const proc = Bun.spawn(["osascript", "-e", 'tell application "System Events" to get name of first process whose frontmost is true'], {
+          stdout: "pipe",
+          stderr: "ignore",
+        })
+        const text = await new Response(proc.stdout).text()
+        const name = text.trim()
+        if (name.length > 0) return isKnownTerminalIdentifier(name)
         return false
       } catch {
         return false
@@ -157,19 +189,26 @@ export const Notify = async ({ client, $, directory }) => {
     return false
   }
 
-  // NOTE: Bun's $ tagged template literal already escapes all interpolated
-  // values, preventing shell injection attacks. The string interpolations
-  // below (e.g. ${title}, ${message}) are safe by design — Bun automatically
-  // quotes and escapes them before passing to the shell.
-  // See: https://bun.sh/docs/runtime/shell
   const sendOsNotification = async (title, message) => {
     if (process.platform === "linux") {
-      await $`notify-send -a "OpenCode" -h "string:desktop-entry:opencode" ${title} ${message} -i ${linuxIconPath}`.nothrow()
+      const proc = Bun.spawn(["notify-send", "-a", "OpenCode", "-h", "string:desktop-entry:opencode", "-i", linuxIconPath, title, message], {
+        stdout: "ignore",
+        stderr: "ignore",
+      })
+      await proc.exited
       return
     }
 
     if (process.platform === "darwin") {
-      await $`osascript -e 'display notification "${message}" with title "${title}"'`.nothrow()
+      const escapeAppleScriptString = (value) => value.replaceAll("\\", "\\\\").replaceAll('"', '\\"')
+      const escapedTitle = escapeAppleScriptString(title)
+      const escapedMessage = escapeAppleScriptString(message)
+      const script = `display notification "${escapedMessage}" with title "${escapedTitle}"`
+      const proc = Bun.spawn(["osascript", "-e", script], {
+        stdout: "ignore",
+        stderr: "ignore",
+      })
+      await proc.exited
     }
   }
 
@@ -188,14 +227,20 @@ export const Notify = async ({ client, $, directory }) => {
    */
   const sendNotification = async ({ title, message, variant, config }) => {
     const focused = config.suppressWhenFocused ? await isTerminalFocused() : false
+    const suppressWhileFocused = focused && variant !== "error"
+    const shouldShowToast = variant === "error"
 
-    try {
-      await client.tui.showToast({ directory, title, message, variant })
-    } catch (error) {
-      void error
+    if (suppressWhileFocused) return
+
+    if (shouldShowToast) {
+      try {
+        await client.tui.showToast({ directory, title, message, variant })
+      } catch (error) {
+        void error
+      }
     }
 
-    if (!focused) {
+    if (!focused || variant === "error") {
       try {
         await sendOsNotification(title, message)
       } catch (error) {
