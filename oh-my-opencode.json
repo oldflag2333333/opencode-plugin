@@ -49,10 +49,10 @@
       "model": "github-copilot/gemini-3-pro-preview"
     },
     "quick": {
-      "model": "zhipuai-coding-plan/glm-4.7"
+      "model": "zhipuai-coding-plan/glm-4.5-air"
     },
     "unspecified-low": {
-      "model": "zhipuai-coding-plan/glm-5"
+      "model": "zhipuai-coding-plan/glm-4.7"
     },
     "unspecified-high": {
       "model": "github-copilot/claude-opus-4.6"
