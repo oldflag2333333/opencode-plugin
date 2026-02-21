@@ -5,7 +5,7 @@
   ],
   "agents": {
     "sisyphus": {
-      "model": "bailian-coding-plan/kimi-k2.5"
+      "model": "kimi-for-coding/k2p5"
     },
     "hephaestus": {
       "model": "openai/gpt-5.3-codex"
@@ -20,7 +20,7 @@
       "model": "bailian-coding-plan/glm-4.7"
     },
     "multimodal-looker": {
-      "model": "bailian-coding-plan/kimi-k2.5"
+      "model": "kimi-for-coding/k2p5"
     },
     "prometheus": {
       "model": "openai/gpt-5.3-codex"
@@ -32,7 +32,7 @@
       "model": "openai/gpt-5.2"
     },
     "atlas": {
-      "model": "bailian-coding-plan/kimi-k2.5"
+      "model": "kimi-for-coding/k2p5"
     }
   },
   "categories": {
@@ -49,7 +49,7 @@
       "model": "github-copilot/gemini-3-pro-preview"
     },
     "quick": {
-      "model": "bailian-coding-plan/glm-4.7"
+      "model": "zhipuai-coding-plan/glm-4.7"
     },
     "unspecified-low": {
       "model": "zhipuai-coding-plan/glm-4.7"
@@ -58,7 +58,7 @@
       "model": "github-copilot/claude-opus-4.6"
     },
     "writing": {
-      "model": "bailian-coding-plan/glm-4.7"
+      "model": "zhipuai-coding-plan/glm-4.7"
     }
   }
 }
