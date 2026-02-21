@@ -6,7 +6,7 @@
   ],
   "provider": {
     "bailian-coding-plan": {
-    "npm": "@ai-sdk/openai-compatibl",
+    "npm": "@ai-sdk/openai-compatible",
     "name": "Bailian Coding Plan",
     "options": {
         "baseURL": "https://coding.dashscope.aliyuncs.com/v1",
