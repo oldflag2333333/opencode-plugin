@@ -5,7 +5,7 @@
   ],
   "agents": {
     "sisyphus": {
-      "model": "openai/gpt-5.3-codex"
+      "model": "zhipuai-coding-plan/glm-5"
     },
     "hephaestus": {
       "model": "openai/gpt-5.3-codex"
