@@ -17,13 +17,13 @@
       "model": "zhipuai-coding-plan/glm-5"
     },
     "explore": {
-      "model": "openai/gpt-5.1-codex"
+      "model": "bailian-coding-plan/glm-4.7"
     },
     "multimodal-looker": {
       "model": "bailian-coding-plan/kimi-k2.5"
     },
     "prometheus": {
-      "model": "github-copilot/claude-opus-4.6"
+      "model": "openai/gpt-5.3-codex"
     },
     "metis": {
       "model": "github-copilot/claude-opus-4.6"
@@ -32,12 +32,12 @@
       "model": "openai/gpt-5.2"
     },
     "atlas": {
-      "model": "openai/gpt-5.3-codex"
+      "model": "bailian-coding-plan/kimi-k2.5"
     }
   },
   "categories": {
     "visual-engineering": {
-      "model": "github-copilot/gemini-3-pro-preview"
+      "model": "zhipuai-coding-plan/glm-5"
     },
     "ultrabrain": {
       "model": "openai/gpt-5.3-codex"
@@ -49,7 +49,7 @@
       "model": "github-copilot/gemini-3-pro-preview"
     },
     "quick": {
-      "model": "zhipuai-coding-plan/glm-4.5-air"
+      "model": "bailian-coding-plan/glm-4.7"
     },
     "unspecified-low": {
       "model": "zhipuai-coding-plan/glm-4.7"
@@ -58,7 +58,7 @@
       "model": "github-copilot/claude-opus-4.6"
     },
     "writing": {
-      "model": "zhipuai-coding-plan/glm-4.7"
+      "model": "bailian-coding-plan/glm-4.7"
     }
   }
 }
