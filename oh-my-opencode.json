@@ -5,7 +5,7 @@
   ],
   "agents": {
     "sisyphus": {
-      "model": "kimi-for-coding/k2p5"
+      "model": "bailian-coding-plan/qwen3.5-plus"
     },
     "hephaestus": {
       "model": "openai/gpt-5.3-codex"
@@ -14,13 +14,13 @@
       "model": "openai/gpt-5.2"
     },
     "librarian": {
-      "model": "zhipuai-coding-plan/glm-5"
+      "model": "bailian-coding-plan/qwen3.5-plus"
     },
     "explore": {
-      "model": "bailian-coding-plan/glm-4.7"
+      "model": "bailian-coding-plan/qwen3.5-plus"
     },
     "multimodal-looker": {
-      "model": "kimi-for-coding/k2p5"
+      "model": "github-copilot/gemini-3-flash-preview"
     },
     "prometheus": {
       "model": "openai/gpt-5.3-codex"
@@ -32,12 +32,12 @@
       "model": "openai/gpt-5.2"
     },
     "atlas": {
-      "model": "kimi-for-coding/k2p5"
+      "model": "bailian-coding-plan/qwen3.5-plus"
     }
   },
   "categories": {
     "visual-engineering": {
-      "model": "zhipuai-coding-plan/glm-5"
+      "model": "bailian-coding-plan/qwen3.5-plus"
     },
     "ultrabrain": {
       "model": "openai/gpt-5.3-codex"
@@ -49,16 +49,16 @@
       "model": "github-copilot/gemini-3-pro-preview"
     },
     "quick": {
-      "model": "zhipuai-coding-plan/glm-4.7"
+      "model": "bailian-coding-plan/qwen3.5-plus"
     },
     "unspecified-low": {
-      "model": "zhipuai-coding-plan/glm-4.7"
+      "model": "bailian-coding-plan/glm-4.7"
     },
     "unspecified-high": {
       "model": "github-copilot/claude-opus-4.6"
     },
     "writing": {
-      "model": "zhipuai-coding-plan/glm-4.7"
+      "model": "github-copilot/claude-sonnet-4.6"
     }
   }
 }

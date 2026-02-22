@@ -6,21 +6,24 @@
   ],
   "provider": {
     "bailian-coding-plan": {
-    "npm": "@ai-sdk/openai-compatible",
+    "npm": "@ai-sdk/anthropic",
     "name": "Bailian Coding Plan",
     "options": {
-        "baseURL": "https://coding.dashscope.aliyuncs.com/v1",
+        "baseURL": "https://coding.dashscope.aliyuncs.com/apps/anthropic/v1",
         "apiKey": "sk-sp-c89f89b8140146efaf69604e4336f1fd"
       },
       "models": {
         "qwen3.5-plus": {
-          "name": "Qwen3.5 Plus"
+          "name": "Qwen3.5 Plus",
+          "options": {
+            "thinking": {
+              "type": "enabled",
+              "budgetTokens": 24576
+            }
+          }
         },
         "glm-4.7": {
           "name": "GLM-4.7"
-        },
-        "kimi-k2.5": {
-          "name": "Kimi K2.5"
         }
       }
     }
