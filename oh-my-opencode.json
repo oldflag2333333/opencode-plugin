@@ -32,7 +32,7 @@
       "model": "openai/gpt-5.2"
     },
     "atlas": {
-      "model": "bailian-coding-plan/qwen3.5-plus"
+      "model": "github-copilot/gpt-5.2-codex"
     }
   },
   "categories": {
