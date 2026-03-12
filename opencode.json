@@ -1,28 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "oh-my-opencode",
-    "@franlol/opencode-md-table-formatter"
+    "oh-my-opencode"
   ],
-  "provider": {
-    "bailian-coding-plan": {
-    "npm": "@ai-sdk/openai-compatible",
-    "name": "Bailian Coding Plan",
-    "options": {
-        "baseURL": "https://coding.dashscope.aliyuncs.com/v1",
-        "apiKey": "sk-sp-c89f89b8140146efaf69604e4336f1fd"
-      },
-      "models": {
-        "qwen3.5-plus": {
-          "name": "Qwen3.5 Plus"
-        },
-        "glm-4.7": {
-          "name": "GLM-4.7"
-        },
-        "kimi-k2.5": {
-          "name": "Kimi K2.5"
-        }
-      }
-    }
-  }
+  "small_model": "alibaba-coding-plan-cn/qwen3.5-plus",
+  "provider": {}
 }
