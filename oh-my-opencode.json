@@ -18,10 +18,10 @@
       "variant": "high"
     },
     "librarian": {
-      "model": "alibaba-coding-plan-cn/qwen3.5-plus"
+      "model": "github-copilot/claude-haiku-4.5"
     },
     "explore": {
-      "model": "alibaba-coding-plan-cn/qwen3.5-plus"
+      "model": "github-copilot/grok-code-fast-1"
     },
     "multimodal-looker": {
       "model": "kimi-for-coding/k2p5"
@@ -53,7 +53,7 @@
       "model": "github-copilot/gemini-3-pro-preview"
     },
     "quick": {
-      "model": "alibaba-coding-plan-cn/qwen3.5-plus"
+      "model": "github-copilot/claude-haiku-4.5"
     },
     "unspecified-low": {
       "model": "kimi-for-coding/k2p5"
