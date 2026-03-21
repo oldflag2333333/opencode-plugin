@@ -15,10 +15,10 @@
       "variant": "high"
     },
     "librarian": {
-      "model": "alibaba-coding-plan-cn/qwen3.5-plus"
+      "model": "kimi-for-coding/k2p5"
     },
     "explore": {
-      "model": "alibaba-coding-plan-cn/qwen3.5-plus"
+      "model": "kimi-for-coding/k2p5"
     },
     "multimodal-looker": {
       "model": "kimi-for-coding/k2p5"
@@ -50,7 +50,7 @@
       "model": "github-copilot/gemini-3-pro-preview"
     },
     "quick": {
-      "model": "alibaba-coding-plan-cn/qwen3.5-plus"
+      "model": "kimi-for-coding/k2p5"
     },
     "unspecified-low": {
       "model": "kimi-for-coding/k2p5"
