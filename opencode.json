@@ -3,6 +3,6 @@
   "plugin": [
     "oh-my-opencode"
   ],
-  "small_model": "alibaba-coding-plan-cn/qwen3.5-plus",
+  "small_model": "kimi-for-coding/k2p5",
   "provider": {}
 }
