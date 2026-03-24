@@ -58,7 +58,8 @@
       "model": "kimi-for-coding/k2p5"
     },
     "unspecified-high": {
-      "model": "github-copilot/gpt-5.4"
+      "model": "github-copilot/gpt-5.4",
+      "variant": "high"
     },
     "writing": {
       "model": "kimi-for-coding/k2p5"
