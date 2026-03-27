@@ -15,10 +15,10 @@
       "variant": "high"
     },
     "librarian": {
-      "model": "kimi-for-coding/k2p5"
+      "model": "opencode-go/minimax-m2.7"
     },
     "explore": {
-      "model": "opencode/minimax-m2.5"
+      "model": "opencode-go/minimax-m2.5"
     },
     "multimodal-looker": {
       "model": "kimi-for-coding/k2p5"
@@ -52,7 +52,7 @@
       "model": "github-copilot/gemini-3-pro-preview"
     },
     "quick": {
-      "model": "kimi-for-coding/k2p5"
+      "model": "opencode-go/minimax-m2.7"
     },
     "unspecified-low": {
       "model": "kimi-for-coding/k2p5"
