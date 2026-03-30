@@ -1,7 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "oh-my-opencode"
+    "oh-my-opencode",
+    "opencode-scheduler"
   ],
   "small_model": "kimi-for-coding/k2p5",
   "provider": {}
