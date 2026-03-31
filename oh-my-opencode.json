@@ -38,7 +38,7 @@
   },
   "categories": {
     "visual-engineering": {
-      "model": "github-copilot/gemini-3-pro-preview"
+      "model": "github-copilot/gemini-3.1-pro-preview"
     },
     "ultrabrain": {
       "model": "github-copilot/gpt-5.4",
