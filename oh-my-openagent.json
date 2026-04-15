@@ -3,6 +3,7 @@
   "disabled_hooks": [
     "session-notification"
   ],
+  "disabled_skills": ["playwright"],
   "agents": {
     "sisyphus": {
       "model": "openai/gpt-5.4"
