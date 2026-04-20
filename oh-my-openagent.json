@@ -19,7 +19,7 @@
       "model": "opencode-go/minimax-m2.7"
     },
     "explore": {
-      "model": "opencode-go/minimax-m2.5"
+      "model": "opencode-go/qwen3.5-plus"
     },
     "multimodal-looker": {
       "model": "opencode-go/kimi-k2.5"
