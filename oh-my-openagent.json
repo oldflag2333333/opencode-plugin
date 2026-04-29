@@ -53,7 +53,7 @@
       "model": "github-copilot/gemini-3.1-pro-preview"
     },
     "quick": {
-      "model": "opencode-go/minimax-m2.7"
+      "model": "opencode-go/kimi-k2.5"
     },
     "unspecified-low": {
       "model": "opencode-go/kimi-k2.5"
