@@ -18,7 +18,7 @@
       "variant": "high"
     },
     "librarian": {
-      "model": "opencode-go/qwen3.6-plus"
+      "model": "opencode-go/qwen3.5-plus"
     },
     "explore": {
       "model": "opencode-go/qwen3.5-plus"
@@ -36,7 +36,7 @@
       "model": "github-copilot/gpt-5.5"
     },
     "atlas": {
-      "model": "openai/gpt-5.5"
+      "model": "github-copilot/claude-sonnet-4.6"
     }
   },
   "categories": {
